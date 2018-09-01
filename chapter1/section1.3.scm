@@ -157,4 +157,110 @@
 (newline)
 
 
+;; ------------------------------ ;;
+;; Procedures as first class data ;;
+;; ------------------------------ ;;
 
+;; In List, procedures are first class data, so we can:
+;;     - give them a name;
+;;     - use them as arguments to other porcedures;
+;;     - return them as the result of the application of other procedures; and
+;;     - include them in data structures.
+
+;; Let's see how we can:
+;;     - use procedures as arguments of other procedures; and
+;;     - obtain procedures as the result of the application of other procedures.
+
+;; We'll compute the square root function using different approaches:
+;;     (1) Fixed-point search method.
+;;     (2) Newton's method.
+;;     (3) An even more general fixed-point search method, that we'll use to compute the square root as:
+;;         (3.1) y  |->  x/y   (using "average-damp")
+;;         (3.1) y  |->  y²-x  (using "newton-transform")
+
+
+;; (1) Fixed-point search method
+;; -----------------------------
+
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+(define (average-damp f)
+  (lambda (x) (average x (f x))))
+
+(define (sqrt1 x)
+  (fixed-point (average-damp (lambda (y) (/ x y)))
+               1.0))
+
+(newline)
+(newline)
+(display "Compute the square root of 7 by using 4 different approaches")
+(newline)
+(display "Fixed-point search = ")
+(display (sqrt1 7))
+(newline)
+
+
+;; (2) Newton's method
+;; -------------------
+
+(define dx 0.00001)
+
+(define (deriv g)
+  (lambda (x)
+    (/ (- (g (+ x dx)) (g x))
+       dx)))
+
+(define (newton-transform g)
+  (lambda (x)
+    (- x (/ (g x) ((deriv g) x)))))
+
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) guess))
+
+(define (sqrt2 x)
+  (newtons-method (lambda (y) (- (square y) x))
+                  1.0))
+
+(display "Newton's method = ")
+(display (sqrt2 7))
+(newline)
+
+
+;; (3.1) General fixed-point search using average dumping
+;; ------------------------------------------------------
+
+(define (fixed-point-of-transform g transform guess)
+  (fixed-point (transform g) guess))
+
+(define (sqrt3 x)
+  (fixed-point-of-transform (lambda (y) (/ x y))
+                            average-damp
+                            1.0))
+
+(display "General fixed-point search (average dumping) = ")
+(display (sqrt3 7))
+(newline)
+
+
+;; (3.1) General fixed-point search using average dumping
+;; ------------------------------------------------------
+
+(define (sqrt4 x)
+  (fixed-point-of-transform (lambda (y) (- (square y) x))
+                            newton-transform
+                            1.0))
+
+(display "General fixed-point search (Newton tranformation) = ")
+(display (sqrt4 7))
+(newline)
+(newline)
