@@ -252,8 +252,8 @@
 (newline)
 
 
-;; (3.1) General fixed-point search using average dumping
-;; ------------------------------------------------------
+;; (3.2) General fixed-point search using Newton's tranform
+;; --------------------------------------------------------
 
 (define (sqrt4 x)
   (fixed-point-of-transform (lambda (y) (- (square y) x))
