@@ -1,5 +1,5 @@
 ;; ============= ;;
-;; Exercise 1.44 ;;
+;; Exercise 1.45 ;;
 ;; ============= ;;
 
 ;; Fixed point procedure:
