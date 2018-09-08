@@ -82,6 +82,23 @@ e ; (1 2 3 4)
 (map + (list 1 2 3) (list 40 50 60) (list 700 800 900))
 
 
+;; more examples about how to use map:
+
+;; "sqrt" procedure only accepts one argument, so only one list:
+(map sqrt (list 1 4 9))
+
+;; "expt" procedure accepts two arguments, so two lists:
+(map expt (list 1 2 3) (list 4 5 6))
+(map expt (list 1 2 3) 3) ; error
+(map expt (list 1 2 3) (list 3 3)) ; not an error, but only computes the first two elements
+(map expt (list 1 2 3) (list 3 3 3))
+
+;; "+" procedure accepts one or more arguments:
+(map + (list 1 2 3) (list 4 5 6))
+(map + (list 1 2 3) (list 4 5 6) (list 7 8 9))
+(map + (list 1 2 3)) ; not an error, because "+" accepts one argument as well
+
+
 ;; "map" procedure for a single list can be implemented this way
 ;; -------------------------------------------------------------
 
