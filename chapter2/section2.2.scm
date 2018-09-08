@@ -14,9 +14,19 @@ b ; ((1 2 . 3) . 4)
 c ; (1 2 3 . 4)
 d ; (((1 . 2) . 3) . 4)
 
-;; Most common option:
+;; Most common option (called a "list" in Lisp terminology):
 (define e (cons 1 (cons 2 (cons 3 (cons 4 '())))))
 e ; (1 2 3 4)
+
+;; See the differences and how important it is!:
+(car a) ; (1 2)
+(cdr a) ; (3 4)
+
+(car b) ; (1 (2 3))
+(cdr b) ; 4
+
+(car e) ; 1
+(cdr e) ; (2 3 4)
 
 
 ;; --------------- ;;
