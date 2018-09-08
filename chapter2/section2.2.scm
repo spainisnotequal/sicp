@@ -2,6 +2,22 @@
 ;; Section 2.2: Hierarchical Data and the Closure Property ;;
 ;; ======================================================= ;;
 
+;; From Figure 2.3: Two ways to combine 1 2 3 4:
+(define a (cons (cons 1 2) (cons 3 4)))
+(define b (cons (cons 1 (cons 2 3)) 4))
+a ; ((1 . 2) 3 . 4)
+b ; ((1 2 . 3) . 4)
+
+;; Some other options:
+(define c (cons 1 (cons 2 (cons 3 4))))
+(define d (cons (cons (cons 1 2) 3) 4))
+c ; (1 2 3 . 4)
+d ; (((1 . 2) . 3) . 4)
+
+;; Most common option:
+(define e (cons 1 (cons 2 (cons 3 (cons 4 '())))))
+e ; (1 2 3 4)
+
 
 ;; --------------- ;;
 ;; List operations ;;
