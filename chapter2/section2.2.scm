@@ -2,6 +2,7 @@
 ;; Section 2.2: Hierarchical Data and the Closure Property ;;
 ;; ======================================================= ;;
 
+
 ;; From Figure 2.3: Two ways to combine 1 2 3 4:
 (define a (cons (cons 1 2) (cons 3 4)))
 (define b (cons (cons 1 (cons 2 3)) 4))
@@ -27,6 +28,11 @@ e ; (1 2 3 4)
 
 (car e) ; 1
 (cdr e) ; (2 3 4)
+
+
+;; ---------------------------- ;;
+;; 2.2.1 Representing Sequences ;;
+;; ---------------------------- ;;
 
 
 ;; --------------- ;;
@@ -120,3 +126,51 @@ e ; (1 2 3 4)
        items))
 
 (scale-list (list 1 2 3 4 5) 10)
+
+
+;; ----------------------------- ;;
+;; 2.2.2 Hierarchical Structures ;;
+;; ----------------------------- ;;
+
+
+(define (count-leaves x)
+  (cond ((null? x) 0)
+	((not (pair? x)) 1)
+	(else (+ (count-leaves (car x))
+		 (count-leaves (cdr x))))))
+
+(define x (cons (list 1 2) (list 3 4))) ; ((1 2) 3 4)
+
+(length x) ; 3
+(count-leaves x) ; 4
+
+(list x x)
+(length (list x x)) ; 2
+(count-leaves (list x x)) ; 8 
+
+
+;; ------------------ ;;
+;; Mapping over trees ;;
+;; ------------------ ;;
+
+
+(define (scale-tree tree factor)
+  (cond ((null? tree) '())
+        ((not (pair? tree)) (* tree factor))
+        (else (cons (scale-tree (car tree) factor)
+                    (scale-tree (cdr tree) factor)))))
+
+(define a-tree (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+
+(scale-tree a-tree 10)
+
+;; using "map" and recursion, we can implement "scale-tree" as:
+
+(define (scale-tree tree factor)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (scale-tree sub-tree factor)
+             (* sub-tree factor)))
+       tree))
+
+(scale-tree a-tree 10)
