@@ -174,3 +174,124 @@ e ; (1 2 3 4)
        tree))
 
 (scale-tree a-tree 10)
+
+
+;; ------------------------------------------ ;;
+;; 2.2.3 Sequences as Conventional Interfaces ;;
+;; ------------------------------------------ ;;
+
+(define (sum-odd-squares tree)
+  (cond ((null? tree) 0)  
+        ((not (pair? tree)) (if (odd? tree) (square tree) 0))
+        (else (+ (sum-odd-squares (car tree))
+                 (sum-odd-squares (cdr tree))))))
+
+(sum-odd-squares (cons 1 (cons (cons 2 5) 3)))
+
+(define (even-fibs n)
+  (define (next k)
+    (if (> k n)
+        '()
+        (let ((f (fib k)))
+          (if (even? f)
+              (cons f (next (+ k 1)))
+              (next (+ k 1))))))
+  (next 0))
+
+(define (fib n)
+  (define (fib-iter a b count)
+    (if (= count 0)
+	b
+	(fib-iter (+ a b) a (- count 1))))
+  (fib-iter 1 0 n))
+
+(even-fibs 9)
+
+
+;; Redifining those procedures folloing the workflow represented in Figure 2.7:
+
+
+;; Map:  (already defined in section 2.2.1)
+(define (map proc items)
+  (if (null? items)
+      '()
+      (cons (proc (car items))
+            (map proc (cdr items)))))
+
+(map square (list 1 2 3 4 5))
+
+;; Filter:
+(define (filter pred seq)
+  (cond ((null? seq) '())
+        ((pred (car seq)) (cons (car seq) (filter pred (cdr seq))))
+        (else (filter pred (cdr seq)))))
+
+(filter even? (list 1 2 3 4 5))
+(filter odd? (list 1 2 3 4 5))
+
+;; Accumulate:
+(define (accumulate proc initial sequence)
+  (if (null? sequence)
+      initial
+      (proc (car sequence)
+	    (accumulate proc initial (cdr sequence)))))
+
+(accumulate + 0 (list 1 2 3 4 5))
+(accumulate * 1 (list 1 2 3 4 5))
+(accumulate cons '() (list 1 2 3 4 5))
+
+;; Enumerate:
+
+(define (enumerate-interval low high)
+  (if (> low high)
+      '()
+      (cons low (enumerate-interval (+ low 1) high))))
+
+(enumerate-interval 2 7)
+
+(define (enumerate-tree tree)
+  (cond ((null? tree) '())
+        ((not (pair? tree)) (list tree))
+        (else (append (enumerate-tree (car tree))
+                      (enumerate-tree (cdr tree))))))
+
+(enumerate-tree (list 1 (list 2 (list 3 4)) 5))
+
+;; Redifinition of "sum-odd-squares":
+(define (sum-odd-squares tree)
+  (accumulate +
+              0
+              (map square
+                   (filter odd?
+                           (enumerate-tree tree)))))
+
+(sum-odd-squares (cons 1 (cons (cons 2 5) 3)))
+
+;; Redefinition of "even-fibs":
+(define (even-fibs n)
+  (accumulate cons
+              '()
+              (filter even?
+                      (map fib
+                           (enumerate-interval 0 n)))))
+
+(even-fibs 9)
+
+;; Other procedures defined using this general procedures: map, filter, accumulate,...
+
+(define (list-fib-squares n)
+  (accumulate cons
+              '()
+              (map square
+                   (map fib
+                        (enumerate-interval 0 n)))))
+
+(list-fib-squares 10)
+
+(define (product-of-squares-of-odd-elements sequence)
+  (accumulate *
+              1
+              (map square
+                   (filter odd? sequence))))
+
+(product-of-squares-of-odd-elements (list 1 2 3 4 5))
