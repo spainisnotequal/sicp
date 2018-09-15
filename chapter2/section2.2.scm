@@ -295,3 +295,52 @@ e ; (1 2 3 4)
                    (filter odd? sequence))))
 
 (product-of-squares-of-odd-elements (list 1 2 3 4 5))
+
+
+;; NESTED MAPPINGS ;;
+
+(accumulate append '() (map (lambda (i)
+			      (map (lambda (j)
+				     (list i j))
+				   (enumerate-interval 1 (- i 1))))
+			    (enumerate-interval 1 6)))
+
+(define (flatmap proc seq)
+  (accumulate append '() (map proc seq)))
+
+(define (pair-sum pair)
+  (+ (car pair) (cadr pair)))
+
+(define (is-7? pair)
+  (= (pair-sum pair) 7))
+
+(define (make-pair-sum pair)
+  (list (car pair) (cadr pair) (pair-sum pair)))
+
+(define (7-sum-pairs n)
+  (map make-pair-sum
+       (filter is-7? (flatmap
+		      (lambda (i)
+			(map (lambda (j)
+			       (list i j))
+			     (enumerate-interval 1 (- i 1))))
+		      (enumerate-interval 1 n)))))
+
+(7-sum-pairs 6)
+
+
+(define (permutations s)
+  (if (null? s)
+      (list '())
+      (flatmap (lambda (x)
+		 (map (lambda (p)
+			(cons x p))
+		      (permutations (remove x s))))
+	       s)))
+
+(define (remove item sequence)
+  (filter (lambda (x)
+	    (not (= x item)))
+	  sequence))
+
+(permutations (list 1 2 3))
