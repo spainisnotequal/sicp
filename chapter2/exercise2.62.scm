@@ -1,5 +1,5 @@
 ;; ============= ;;
-;; Exercise 2.61 ;;
+;; Exercise 2.62 ;;
 ;; ============= ;;
 
 (define (element-of-set? x set)
