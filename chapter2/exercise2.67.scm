@@ -13,13 +13,6 @@
 (define (symbol-leaf x) (cadr x))
 (define (weight-leaf x) (caddr x))
 
-;; Tests:
-
-(define leaf1 (make-leaf 'A 8))
-(leaf? leaf1)
-(symbol-leaf leaf1)
-(weight-leaf leaf1)
-
 ;; -------------------------------------- ;;
 ;; Huffman tree constructor and selectors ;;
 ;; -------------------------------------- ;;
@@ -42,29 +35,56 @@
       (weight-leaf tree)
       (cadddr tree)))
 
-;; Tests:
+;; ------------------ ;;
+;; Decoding procedure ;;
+;; ------------------ ;;
 
-(define lA (make-leaf 'A 8))
-(define lB (make-leaf 'B 3))
-(define lC (make-leaf 'C 1))
-(define lD (make-leaf 'D 1))
-(define lE (make-leaf 'E 1))
-(define lF (make-leaf 'F 1))
-(define lG (make-leaf 'G 1))
-(define lH (make-leaf 'H 1))
+(define (decode bits tree)
+  (define (decode-1 bits current-branch)
+    (if (null? bits)
+        '()
+        (let ((next-branch
+               (choose-branch (car bits) current-branch)))
+          (if (leaf? next-branch)
+              (cons (symbol-leaf next-branch)
+                    (decode-1 (cdr bits) tree))
+              (decode-1 (cdr bits) next-branch)))))
+  (decode-1 bits tree))
 
-(define tGH (make-code-tree lG lH))
-(define tEF (make-code-tree lE lF))
-(define tEFGH (make-code-tree tEF tGH))
-(define tCD (make-code-tree lC lD))
-(define tBCD (make-code-tree lB tCD))
-(define tBCDEFGH (make-code-tree tBCD tEFGH))
-(define tABCDEFGH (make-code-tree lA tBCDEFGH))
+(define (choose-branch bit branch)
+  (cond ((= bit 0) (left-branch branch))
+        ((= bit 1) (right-branch branch))
+        (else (error "bad bit -- CHOOSE-BRANCH" bit))))
 
-(left-branch tABCDEFGH)
-(right-branch tABCDEFGH)
-(left-branch tBCD)
-(right-branch tBCD)
+;; ------------------------ ;;
+;; Set of weighted elements ;;
+;; ------------------------ ;;
 
-(symbols tABCDEFGH)
-(weight tABCDEFGH)
+(define (adjoin-set x set)
+  (cond ((null? set) (list x))
+        ((< (weight x) (weight (car set))) (cons x set))
+        (else (cons (car set)
+                    (adjoin-set x (cdr set))))))
+
+(define (make-leaf-set pairs)
+  (if (null? pairs)
+      '()
+      (let ((pair (car pairs)))
+        (adjoin-set (make-leaf (car pair)    ; symbol
+                               (cadr pair))  ; frequency
+                    (make-leaf-set (cdr pairs))))))
+
+;; ------------------------------------ ;;
+;; And now, let's start the exercise... ;;
+;; ------------------------------------ ;;
+
+(define sample-tree
+  (make-code-tree (make-leaf 'A 4)
+                  (make-code-tree
+                   (make-leaf 'B 2)
+                   (make-code-tree (make-leaf 'D 1)
+                                   (make-leaf 'C 1)))))
+
+(define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
+
+(decode sample-message sample-tree)
