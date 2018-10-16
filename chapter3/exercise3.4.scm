@@ -1,5 +1,5 @@
 ;; ============ ;;
-;; Exercise 3.3 ;;
+;; Exercise 3.4 ;;
 ;; ============ ;;
 
 (define (make-account balance password)
