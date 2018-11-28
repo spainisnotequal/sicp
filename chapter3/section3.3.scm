@@ -29,14 +29,14 @@ z2
 ;; ------------------- ;;
 
 ;; constructor:
-
 (define (make-queue)
   (cons '() '()))
 
-;; selectors:
+;; predicate:
 (define (empty-queue? queue)
   (null? (front-ptr queue)))
 
+;; selectors:
 (define (front-ptr queue)
   (car queue))
 
